@@ -1,18 +1,18 @@
 --[[
 
-     Powerarrow Dark Awesome WM theme
-     github.com/lcpz
+     Corealugly Dark Awesome WM theme
 
 --]]
 
-local gears = require("gears")
-local lain  = require("lain")
-local awful = require("awful")
-local wibox = require("wibox")
-local os    = { getenv = os.getenv }
+local gears       = require("gears")
+local lain        = require("lain")
+local awful       = require("awful")
+local wibox       = require("wibox")
+local corealugly  = require("corealugly")
+local os          = { getenv = os.getenv }
 
 local theme                                     = {}
-theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/powerarrow-dark"
+theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/corealugly-dark"
 theme.wallpaper                                 = theme.dir .. "/wall.png"
 theme.font                                      = "xos4 Terminus 9"
 theme.fg_normal                                 = "#DDDDFF"
@@ -128,6 +128,22 @@ local mail = lain.widget.imap({
 })
 --]]
 
+
+-- keyboard layout --
+kbdwidget = wibox.widget.textbox()
+kbdwidget:set_markup(markup.font(theme.font," ENG "))
+
+dbus.request_name("session", "ru.gentoo.kbdd")
+dbus.add_match("session", "interface='ru.gentoo.kbdd',member='layoutChanged'")
+dbus.connect_signal("ru.gentoo.kbdd", function(...)
+    local data = {...}
+    local layout = data[2]
+    lts = {[0] = "ENG", [1] = "RUS"}
+    kbdwidget:set_markup(markup.font(theme.font," "..lts[layout].." "))
+    end
+)
+
+
 -- MPD
 local musicplr = awful.util.terminal .. " -title Music -g 130x34-320+16 -e ncmpcpp"
 local mpdicon = wibox.widget.imagebox(theme.widget_music)
@@ -222,6 +238,7 @@ local bat = lain.widget.bat({
     end
 })
 
+--[[
 -- ALSA volume
 local volicon = wibox.widget.imagebox(theme.widget_vol)
 theme.volume = lain.widget.alsa({
@@ -239,6 +256,48 @@ theme.volume = lain.widget.alsa({
         widget:set_markup(markup.font(theme.font, " " .. volume_now.level .. "% "))
     end
 })
+--]]
+
+-- PulseAudio volume
+local volicon = wibox.widget.imagebox(theme.widget_vol)
+theme.volume = corealugly.widget.pulseaudio({
+    settings = function()
+        if volume_now.muted == "yes" then
+            volicon:set_image(theme.widget_vol_mute)
+        elseif tonumber(volume_now.left) == 0 then
+            volicon:set_image(theme.widget_vol_no)
+        elseif tonumber(volume_now.left) <= 50 then
+            volicon:set_image(theme.widget_vol_low)
+        else
+            volicon:set_image(theme.widget_vol)
+        end
+--        widget:set_markup(markup.font(theme.font, " " .. volume_now.right .. "% "))
+        widget:set_markup(markup.font(theme.font, " " .. volume_now.left .. "% "))
+    end
+})
+
+-- PulseAudio volume control button --
+theme.volume.widget:buttons(awful.util.table.join(
+    awful.button({}, 1, function() -- left click
+        awful.spawn("pavucontrol")
+    end),
+    awful.button({}, 2, function() -- middle click
+        awful.spawn(string.format("pactl set-sink-volume %d 100%%", volume_now.index))
+        theme.volume.update()
+    end),
+    awful.button({}, 3, function() -- right click
+        awful.spawn(string.format("pactl set-sink-mute %d toggle", volume_now.index))
+        theme.volume.update()
+    end),
+    awful.button({}, 4, function() -- scroll up
+        awful.spawn(string.format("pactl set-sink-volume %d +1%%", volume_now.index))
+        theme.volume.update()
+    end),
+    awful.button({}, 5, function() -- scroll down
+        awful.spawn(string.format("pactl set-sink-volume %d -1%%", volume_now.index))
+        theme.volume.update()
+    end)
+))
 
 -- Net
 local neticon = wibox.widget.imagebox(theme.widget_net)
@@ -304,6 +363,7 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             spr,
+	    kbdwidget,
             arrl_ld,
             wibox.container.background(mpdicon, theme.bg_focus),
             wibox.container.background(theme.mpd.widget, theme.bg_focus),
