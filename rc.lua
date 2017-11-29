@@ -109,6 +109,27 @@ awful.layout.layouts = {
     --lain.layout.termfair,
     --lain.layout.termfair.center,
 }
+
+--{{{ Key Code
+local key_toggle     = "#172"
+local key_move_right = "#171"
+local key_move_left  = "#173"
+local key_sleep      = "#150"    --!
+
+local key_Mute       = "#121"    
+local key_Vol_Down   = "#122"
+local key_Vol_Up     = "#123"
+
+local key_Brightness_Up = "#233"
+local key_Brightness_Down = "#232"
+
+-- change laytout key
+local key_Tile_Next = "#128" --!
+local key_Tile_Prev = "#152" --!
+local key_Tile_Prev_F11 = "#95"
+local key_Tile_Next_F12 = "#96"
+--}}}
+
 awful.util.taglist_buttons = awful.util.table.join(
                     awful.button({ }, 1, function(t) t:view_only() end),
                     awful.button({ modkey }, 1, function(t)
@@ -391,6 +412,7 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86MonBrightnessDown", function () awful.util.spawn("xbacklight -dec 10") end,
               {description = "-10%", group = "hotkeys"}),
 
+    --[[
     -- ALSA volume control
     awful.key({ altkey }, "Up",
         function ()
@@ -422,8 +444,66 @@ globalkeys = awful.util.table.join(
             beautiful.volume.update()
         end,
         {description = "volume 0%", group = "hotkeys"}),
+    --]]
 
-    -- MPD control
+    -------------------------------
+    -- PulseAudio volume control --
+    -------------------------------
+    -- Notebook
+        awful.key({ modkey }, "F1",
+        function ()
+            os.execute(string.format("pactl set-sink-mute %d toggle", volume_now.index ))
+            beautiful.volume.update()
+        end),
+    awful.key({ modkey }, "F2",
+        function ()
+                os.execute(string.format("pactl set-sink-volume %d -1%%", volume_now.index ))
+                beautiful.volume.update()
+        end),
+        awful.key({ modkey }, "F3",
+        function ()
+            os.execute(string.format("pactl set-sink-volume %d +1%%", volume_now.index ))
+            beautiful.volume.update()
+        end),
+    -- Keyboard
+    awful.key({ }, key_Mute,
+        function ()
+            os.execute(string.format("pactl set-sink-mute %d toggle", volume_now.index ))
+            beautiful.volume.update()
+        end),
+    awful.key({  }, key_Vol_Up,
+        function ()
+            os.execute(string.format("pactl set-sink-volume %d +2%%", volume_now.index ))
+            beautiful.volume.update()
+        end),
+    awful.key({  }, key_Vol_Down,
+        function ()
+            os.execute(string.format("pactl set-sink-volume %d -2%%", volume_now.index ))
+            beautiful.volume.update()
+        end),
+    -----------------
+    -- MPD control --
+    -----------------
+    -- Keyboard
+    awful.key({  }, key_toggle,
+        function ()
+            awful.spawn.with_shell("mpc toggle")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc toggle", group = "widgets"}),
+    awful.key({  }, key_move_left,
+        function ()
+            awful.spawn.with_shell("mpc prev")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc prev", group = "widgets"}),
+    awful.key({  }, key_move_right,
+        function ()
+            awful.spawn.with_shell("mpc next")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc next", group = "widgets"}),
+    -- Notebook
     awful.key({ altkey, "Control" }, "Up",
         function ()
             awful.spawn.with_shell("mpc toggle")
@@ -448,6 +528,7 @@ globalkeys = awful.util.table.join(
             beautiful.mpd.update()
         end,
         {description = "mpc next", group = "widgets"}),
+    --???
     awful.key({ altkey }, "0",
         function ()
             local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
