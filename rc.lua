@@ -19,6 +19,7 @@ local lain          = require("lain")
 --local menubar       = require("menubar")
 local freedesktop   = require("freedesktop")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
+local corealugly    = require("corealugly.util.screenshot")
 -- }}}
 
 -- {{{ Error handling
@@ -246,9 +247,15 @@ root.buttons(awful.util.table.join(
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
     -- Take a screenshot
-    -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey }, "p", function() os.execute("screenshot") end,
-              {description = "take a screenshot", group = "hotkeys"}),
+    --awful.key({ altkey }, "p", function() os.execute("screenshot") end),
+    awful.key({ modkey, }, "p", scrot_full,
+      {description = "Take a screenshot of entire screen", group = "screenshot"}),
+    awful.key({ altkey, }, "p", scrot_selection,
+      {description = "Take a screenshot of selection", group = "screenshot"}),
+    --awful.key({ "Shift" }, "p", scrot_window,
+    --  {description = "Take a screenshot of focused window", group = "screenshot"}),
+    --awful.key({ "Ctrl" }, "p", scrot_delay,
+    --  {description = "Take a screenshot of delay", group = "screenshot"}),
 
     -- Hotkeys
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,

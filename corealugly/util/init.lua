@@ -1,6 +1,6 @@
 local wrequire     = require("lain.helpers").wrequire
 local setmetatable = setmetatable
 
-local lib = { _NAME = "corealugly.util", wrequire = wrequire }
+local util = { _NAME = "corealugly.util" }
 
-return setmetatable(lib, { __index = wrequire })
+return setmetatable(util, { __index = wrequire })
