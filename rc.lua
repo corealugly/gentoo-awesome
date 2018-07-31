@@ -568,9 +568,9 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
     --]]
-    --[ dmenu
-    awful.key({ altkey }, "3", function ()
-        awful.spawn(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
+    --[ rofi
+    awful.key({ altkey }, "F2", function ()
+        awful.spawn(string.format("rofi -show run  -theme glue_pro_blue",
         beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
 		end,
         {description = "show dmenu", group = "launcher"}),
