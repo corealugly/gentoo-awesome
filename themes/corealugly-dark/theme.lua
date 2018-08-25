@@ -135,12 +135,13 @@ kbdwidget:set_markup(markup.font(theme.font," ENG "))
 
 dbus.request_name("session", "ru.gentoo.kbdd")
 dbus.add_match("session", "interface='ru.gentoo.kbdd',member='layoutChanged'")
-dbus.connect_signal("ru.gentoo.kbdd", function(...)
+dbus.connect_signal("ru.gentoo.kbdd", 
+  function(...)
     local data = {...}
     local layout = data[2]
     lts = {[0] = "ENG", [1] = "RUS"}
     kbdwidget:set_markup(markup.font(theme.font," "..lts[layout].." "))
-    end
+  end
 )
 
 

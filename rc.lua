@@ -56,6 +56,7 @@ local function run_once(cmd_arr)
 end
 
 run_once({ "unclutter -root" }) -- entries must be comma-separated
+--run_once({ "kbdd" })
 -- }}}
 
 -- {{{ Variable definitions
@@ -246,7 +247,9 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
-    -- Take a screenshot
+    ----------------
+    -- SCREENSHOT --
+    ----------------
     --awful.key({ altkey }, "p", function() os.execute("screenshot") end),
     awful.key({ modkey, }, "p", scrot_full,
       {description = "Take a screenshot of entire screen", group = "screenshot"}),
@@ -257,10 +260,15 @@ globalkeys = awful.util.table.join(
     --awful.key({ "Ctrl" }, "p", scrot_delay,
     --  {description = "Take a screenshot of delay", group = "screenshot"}),
 
-    -- Hotkeys
+    ------------------
+    -- HELP HOTKEYS --
+    ------------------
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description = "show help", group="awesome"}),
-    -- Tag browsing
+
+    ------------------
+    -- Tag browsing --
+    ------------------
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
               {description = "view previous", group = "tag"}),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
@@ -353,7 +361,9 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey, "Control" }, "-", function () lain.util.useless_gaps_resize(-1) end,
               {description = "decrement useless gaps", group = "tag"}),
 
-    -- Dynamic tagging
+    ---------------------
+    -- Dynamic tagging --
+    ---------------------
     awful.key({ modkey, "Shift" }, "n", function () lain.util.add_tag() end,
               {description = "add new tag", group = "tag"}),
     awful.key({ modkey, "Shift" }, "r", function () lain.util.rename_tag() end,
@@ -401,7 +411,31 @@ globalkeys = awful.util.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
-    -- Dropdown application
+    ----------------------
+    -- change layout FN --??????
+    ----------------------
+    awful.key({ }, key_Tile_Next, function () awful.layout.inc( 1) end,
+              {description = "select next", group = "layout"}),
+    awful.key({ }, key_Tile_Prev, function () awful.layout.inc(-1) end,
+              {description = "select previous", group = "layout"}),
+
+    ----------------------------
+    -- change layout Keyboard --
+    ----------------------------
+    awful.key({ modkey }, key_Tile_Next_F12, function () awful.layout.inc( 1) end,
+              {description = "select next", group = "layout"}),
+    awful.key({ modkey }, key_Tile_Prev_F11, function () awful.layout.inc(-1) end,
+              {description = "select previous", group = "layout"}),
+
+    -----------------
+    -- screen lock --
+    -----------------
+    awful.key({ altkey, "Control" }, "l", function () awful.spawn.with_shell("/bin/lock") end,
+              {description = "screen lock", group = "awesome"}),
+
+    --------------------------
+    -- Dropdown application --
+    --------------------------
     awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
               {description = "dropdown application", group = "launcher"}),
 
@@ -568,13 +602,14 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
     --]]
-    --[ rofi
+    ----------
+    -- rofi --
+    ----------
     awful.key({ altkey }, "F2", function ()
         awful.spawn(string.format("rofi -show run  -theme glue_pro_blue",
         beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
 		end,
         {description = "show dmenu", group = "launcher"}),
-    --]
     --[[
     -- Prompt
     awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
@@ -594,6 +629,46 @@ globalkeys = awful.util.table.join(
 )
 
 clientkeys = awful.util.table.join(
+
+    ------------------------------
+    -- Windows snap as window 7 --
+    ------------------------------
+    awful.key({ modkey, altkey }, "Left",
+        function (c)
+	    local f = awful.placement.scale
+	            + awful.placement.left
+		    + (awful.placement['maximize_vertically'] or nil)
+            local geo = f(client.focus, {honor_workarea=true, to_percent = 0.5})
+        end,
+        {description = "left snap", group = "client"}),
+
+    awful.key({ modkey, altkey }, "Right",
+        function (c)
+	    local f = awful.placement.scale
+	            + awful.placement.right
+		    + (awful.placement['maximize_vertically'] or nil)
+            local geo = f(client.focus, {honor_workarea=true, to_percent = 0.5})
+        end,
+        {description = "right snap", group = "client"}),
+
+    awful.key({ modkey, altkey }, "Up",
+        function (c)
+	    local f = awful.placement.scale
+	            + awful.placement.top
+		    + (awful.placement['maximize_horizontally'] or nil)
+            local geo = f(client.focus, {honor_workarea=true, to_percent = 0.5})
+        end,
+        {description = "up snap", group = "client"}),
+
+    awful.key({ modkey, altkey }, "Down",
+        function (c)
+	    local f = awful.placement.scale
+	            + awful.placement.bottom
+		    + (awful.placement['maximize_horizontally'] or nil)
+            local geo = f(client.focus, {honor_workarea=true, to_percent = 0.5})
+        end,
+        {description = "down snap", group = "client"}),
+
     awful.key({ altkey, "Shift"   }, "m",      lain.util.magnify_client,
               {description = "magnify client", group = "client"}),
     awful.key({ modkey,           }, "f",
@@ -710,6 +785,12 @@ awful.rules.rules = {
                      size_hints_honor = false
      }
     },
+
+    { rule = { class = "gcr-prompter" },
+          properties = { screen = 1,
+	                 tag = awful.util.tagnames[1],
+			 maximized = false
+		       } },
 
     -- Titlebars
     { rule_any = { type = { "dialog", "normal" } },
